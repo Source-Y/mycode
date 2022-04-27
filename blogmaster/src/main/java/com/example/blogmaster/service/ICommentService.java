@@ -19,4 +19,6 @@ public interface ICommentService extends IService<Comment> {
     Result publishComment(CommentParam commentParam);
 
     Result commentsByArticleId(ArticleVoId articleVoId);
+
+    Result commentFavor(Long commentId);
 }

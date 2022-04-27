@@ -13,6 +13,7 @@ import com.example.blogmaster.vo.CommentVo;
 import com.example.blogmaster.vo.Result;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -55,12 +56,24 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     public Result commentsByArticleId(ArticleVoId articleVoId) {
         Long article_id = articleVoId.getArticle_id();
         LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Comment::getArticle_id, article_id);
+        queryWrapper.eq(Comment::getArticle_id, article_id)
+                    .orderByDesc(Comment::getFavor, Comment::getCreate_date);
         List<Comment> comments = commentMapper.selectList(queryWrapper);
 
         List<CommentVo> commentVoList = toCommentVoList(comments);
 
         return Result.success(commentVoList);
+    }
+
+    @Async("threadPool")
+    @Override
+    public Result commentFavor(Long commentId) {
+        Comment comment = new Comment();
+        LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Comment::getId, commentId);
+        Comment commentOne = commentMapper.selectOne(queryWrapper);
+        comment.setFavor(commentOne.getFavor()+1);
+        return Result.success("评论点赞");
     }
 
     private List<CommentVo> toCommentVoList(List<Comment> comments) {
@@ -69,6 +82,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         for (Comment comment : comments) {
             if (comment.getIs_father()) {
                 CommentVo commentVo = new CommentVo();
+                commentVo.setId(comment.getId());
                 commentVo.setComment_content(comment.getContent());
                 commentVo.setComment_favor(comment.getFavor());
                 commentVo.setComment_username(comment.getUsername());

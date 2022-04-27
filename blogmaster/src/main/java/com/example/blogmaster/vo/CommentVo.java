@@ -1,5 +1,7 @@
 package com.example.blogmaster.vo;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -12,6 +14,9 @@ import java.util.List;
  */
 @Data
 public class CommentVo implements Serializable {
+
+    @ApiModelProperty(value = "评论id")
+    private Long id;
 
     @ApiModelProperty(value = "评论内容")
     private String comment_content;
