@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
  * </p>
  *
  * @author Ivyevy
- * @since 2022-04-23
  */
 @Service
 public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> implements ICommentService {
