@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.blogmaster.mapper.ArticleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.blogmaster.pojo.Article">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="summary" property="summary" />
+        <result column="comment_count" property="comment_count" />
+        <result column="view_count" property="view_count" />
+        <result column="author_id" property="author_id" />
+        <result column="category_id" property="category_id" />
+        <result column="create_date" property="create_date" />
+        <result column="favor" property="favor" />
+        <result column="body_id" property="body_id" />
+    </resultMap>
+
+    <resultMap id="ArticleVoMap" extends="BaseResultMap" type="com.example.blogmaster.pojo.Article">
+        <association property="admin" javaType="com.example.blogmaster.pojo.Admin">
+            <id column="id" property="id" />
+            <result column="username" property="username" />
+        </association>
+
+        <association property="category" javaType="com.example.blogmaster.pojo.Category">
+            <id column="id" property="id" />
+            <result column="category_name" property="category_name" />
+        </association>
+    </resultMap>
+
+    <resultMap id="ArticleDetailVoMap" extends="ArticleVoMap" type="com.example.blogmaster.pojo.Article">
+        <association property="body" javaType="com.example.blogmaster.pojo.Body">
+            <id column="id" property="id" />
+            <result column="content" property="content" />
+        </association>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, title, summary, comment_count, view_count, author_id, category_id, create_date, favor, body_id
+    </sql>
+
+    <sql id="Base_ArticleList">
+        SELECT ta.`id`,ta.title,ta.summary,ta.comment_count,ta.view_count,ta.create_date,ta.favor,ad.`username`,tc.`category_name`
+        FROM t_article AS ta JOIN t_category AS tc JOIN t_admin ad
+        ON ta.`author_id`=ad.`id` AND ta.`category_id`=tc.`id`
+    </sql>
+    <delete id="deleteArticle">
+        DELETE ta.*, tb.*, tc.*
+        FROM t_article AS ta LEFT JOIN t_body AS tb
+        ON ta.id = tb.`article_id`
+        LEFT JOIN t_category AS tc
+        ON ta.`id`= tc.article_id
+        WHERE ta.id=#{id};
+    </delete>
+
+
+    <select id="listArticle" resultMap="ArticleVoMap">
+        <include refid="Base_ArticleList"/>
+        ORDER BY ta.`create_date` DESC
+    </select>
+
+    <select id="selectArticleDetails" resultMap="ArticleDetailVoMap">
+        SELECT ta.`id`,ta.title,ta.summary,ta.comment_count,ta.view_count,ta.create_date,ta.favor,ad.`username`,tb.`content`,tc.`category_name`
+        FROM t_article AS ta JOIN t_body AS tb JOIN t_category AS tc JOIN t_admin ad
+        ON ta.`author_id`=ad.`id` AND ta.`body_id`=tb.`id` AND ta.`category_id`=tc.`id`
+        WHERE ta.`id`= #{article_id};
+    </select>
+
+    <select id="findHotArticles" resultMap="ArticleVoMap">
+        <include refid="Base_ArticleList"/>
+        ORDER BY favor DESC, view_count DESC LIMIT 5;
+    </select>
+    <select id="findArticleList" resultMap="ArticleVoMap">
+        <include refid="Base_ArticleList"/>
+    </select>
+
+</mapper>

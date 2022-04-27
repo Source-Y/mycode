@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.blogmaster.mapper.CommentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.blogmaster.pojo.Comment">
+        <id column="id" property="id" />
+        <result column="content" property="content" />
+        <result column="article_id" property="article_id" />
+        <result column="username" property="username" />
+        <result column="comment_to" property="comment_to" />
+        <result column="create_date" property="create_date" />
+        <result column="is_father" property="is_father" />
+        <result column="favor" property="favor" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, content, article_id, username, comment_to, create_date, is_father, favor
+    </sql>
+
+</mapper>
